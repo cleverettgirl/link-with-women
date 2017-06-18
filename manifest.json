@@ -15,8 +15,11 @@
   ],
   "content_scripts": [
     {
-      "matches": ["https://www.linkedin.com/*"],
-      "js": ["clarifai.js", "secret.js", "content.js"]
+      "matches": ["https://www.linkedin.com/*", "http://*.d3.js/*", "https://*.d3.js/*"],
+      "js": ["clarifai.js", "secret.js", "content.js", "d3.js"]
     }
-  ]
+  ],
+  "background": {
+    "scripts": ["background.js"]
+  }
 }

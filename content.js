@@ -25,9 +25,11 @@ function femalePercent(data, nodeArr) {
               }
               if (percentFemale < 0.5) {
                 node.closest('li.mn-pymk-list__card').remove()
+                // dataset[male] += 1;
                 console.log(node.alt, 'MALE')
               }
               else {
+                // dataset[female] += 1;
                 console.log(node.alt, 'FEMALE')
               }
             } else {

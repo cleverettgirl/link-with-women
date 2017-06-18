@@ -13,10 +13,20 @@ function getCurrentTabUrl(callback) {
   })
 }
 
+  var dataset = [
+    {sala: "female", value: 0},
+    {sala: "male", value: 0}
+    // {sala: "2 años", value: 840},
+    // {sala: "Primera sección", value: 4579},
+    // {sala: "Segunda sección", value: 5472},
+    // {sala: "Tercera sección", value: 7321},
+  ];
+
 function filterByWomen() {
   chrome.tabs.executeScript(null,
     {code: `
       var ghosts = document.querySelectorAll('.lazy-image.EntityPhoto-circle-7.ghost-person.loaded')
+
       ghosts.forEach(image => {
         var firstName = image.alt.split(' ')[0]
         var url = 'https://gender-api.com/get?key=' + genderKey + '&name=' + firstName
@@ -25,13 +35,17 @@ function filterByWomen() {
         .then(result => {
           // console.log(result)
           if (result.accuracy >= 60 && result.gender === 'male') {
+            dataset[male] += 1;
+            console.log("DATA SET: ", dataset)
             image.closest('li.mn-pymk-list__card').remove()
             console.log('MALE GHOST', result.name)
           }else{
             console.log('FEMALE GHOST', result.name)
+            dataset[female] += 1;
           }
         })
       })
+
       var images = document.querySelectorAll('.lazy-image.EntityPhoto-circle-7.loaded:not(.ghost-person)')
       var data = {}
       var nodeArr = []
@@ -47,11 +61,12 @@ function filterByWomen() {
           }
         }
       })
+
       femalePercent(data, nodeArr)
     `})
-  setTimeout(function(){
-    window.close()
-  }, 2000)
+  // setTimeout(function(){
+  //   window.close()
+  // }, 2000)
 }
 
 function companyFilter() {
@@ -106,9 +121,9 @@ function companyFilter() {
           console.log('Error on', image.alt)
         })
     `})
-  setTimeout(function(){
-    window.close()
-  }, 2000)
+  // setTimeout(function(){
+  //   window.close()
+  // }, 2000)
 }
 
 function renderHTML(value) {
@@ -124,16 +139,16 @@ function cleanFeed() {
         })
       })
     `})
-  setTimeout(function(){
-    window.close()
-  }, 2000)
+  // setTimeout(function(){
+  //   window.close()
+  // }, 2000)
 }
 
 document.addEventListener('DOMContentLoaded', function() {
   getCurrentTabUrl(function(url) {
     if(url.indexOf('linkedin.com/mynetwork') > -1){
       renderHTML('Working...')
-      filterByWomen()
+      // filterByWomen()
     }else if(url.indexOf('linkedin.com/feed') > -1){
       renderHTML('Scroll to clean feed')
       cleanFeed()

@@ -2,23 +2,22 @@
 <html>
   <head>
     <title>Women in Tech</title>
-    <style>
-      body {
-        font-family: "Segoe UI", "Lucida Grande", Tahoma, sans-serif;
-        font-size: 100%;
-      }
-      #witLI {
-        /* avoid an excessively wide status text */
-        white-space: pre;
-        text-overflow: ellipsis;
-        overflow: hidden;
-        max-width: 400px;
-      }
-    </style>
-    <script src="popup.js"></script>
+    <link rel="stylesheet" type="text/css" href="style.css">
   </head>
   <body>
+
+    <div id="banner">
+      <h3> link with women </h3>
+    </div>
+
     <div id="witLI"></div>
+
+    <div id="chart"></div>
+
+
+    <script src="d3.js"></script>
+    <script src="popup.js"></script>
+    <script src="data.js"></script>
   </body>
 </html>
 
