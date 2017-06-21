@@ -1,4 +1,15 @@
-/* global chrome */
+
+function getCurrentTabId(callback){
+  var queryInfo = {
+    active: true,
+    currentWindow: true
+  }
+  chrome.tabs.query(queryInfo, function(tabs) {
+    var tab = tabs[0]
+    var id = tab.id
+    callback(id)
+  })
+}
 
 function getCurrentTabUrl(callback) {
   var queryInfo = {
@@ -8,65 +19,29 @@ function getCurrentTabUrl(callback) {
   chrome.tabs.query(queryInfo, function(tabs) {
     var tab = tabs[0]
     var url = tab.url
+    var id = tab.id
     console.assert(typeof url == 'string', 'tab.url should be a string')
     callback(url)
   })
 }
 
-  var dataset = [
-    {sala: "female", value: 0},
-    {sala: "male", value: 0}
-    // {sala: "2 años", value: 840},
-    // {sala: "Primera sección", value: 4579},
-    // {sala: "Segunda sección", value: 5472},
-    // {sala: "Tercera sección", value: 7321},
-  ];
+var dummyData = [
+  {gender: "male", value: 100},
+  {gender: "female", value: 100}
+]
 
-function filterByWomen() {
-  chrome.tabs.executeScript(null,
-    {code: `
-      var ghosts = document.querySelectorAll('.lazy-image.EntityPhoto-circle-7.ghost-person.loaded')
 
-      ghosts.forEach(image => {
-        var firstName = image.alt.split(' ')[0]
-        var url = 'https://gender-api.com/get?key=' + genderKey + '&name=' + firstName
-        fetch(url)
-        .then(result => result.json())
-        .then(result => {
-          // console.log(result)
-          if (result.accuracy >= 60 && result.gender === 'male') {
-            dataset[male] += 1;
-            console.log("DATA SET: ", dataset)
-            image.closest('li.mn-pymk-list__card').remove()
-            console.log('MALE GHOST', result.name)
-          }else{
-            console.log('FEMALE GHOST', result.name)
-            dataset[female] += 1;
-          }
-        })
-      })
+var dataset = [
+  {gender: "male", value: 1},
+  {gender: "female", value: 1}
+];
 
-      var images = document.querySelectorAll('.lazy-image.EntityPhoto-circle-7.loaded:not(.ghost-person)')
-      var data = {}
-      var nodeArr = []
-      images.forEach(image => {
-        let id = image.parentNode.id
-        if(!data[id]){
-          nodeArr.push(image)
-          data[id] = {
-            alt: image.alt,
-            node: image,
-            src: image.src,
-            femalePercent: null
-          }
-        }
-      })
 
-      femalePercent(data, nodeArr)
-    `})
-  // setTimeout(function(){
-  //   window.close()
-  // }, 2000)
+function filterByWomen(){
+  chrome.tabs.executeScript(null, {code: `
+    filterByWomen()
+    `
+  })
 }
 
 function companyFilter() {
@@ -121,10 +96,10 @@ function companyFilter() {
           console.log('Error on', image.alt)
         })
     `})
-  // setTimeout(function(){
-  //   window.close()
-  // }, 2000)
 }
+
+
+
 
 function renderHTML(value) {
   document.getElementById('witLI').innerHTML = value;
@@ -139,9 +114,7 @@ function cleanFeed() {
         })
       })
     `})
-  // setTimeout(function(){
-  //   window.close()
-  // }, 2000)
+
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -160,3 +133,55 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   })
 })
+
+function setDOMInfo(info) {
+  for(var key in info){
+    if(key === 'male'){
+      dataset[0].value = info.male;
+    }
+    else{
+      dataset[1].value = info.female;
+    }
+  }
+  sendData(dataset)
+}
+
+
+function sendData(data){
+  console.log('DATA INSIDE WAIT FOR DATA: ', data)
+  setTimeout(function(){
+    runD3(dataset)
+  }, 5000)
+}
+
+
+// Once the DOM is ready...
+document.addEventListener('DOMContentLoaded', function () {
+  runD3(dummyData)
+});
+
+
+var $button = document.getElementById('filter')
+
+$button.addEventListener("click", function(){
+
+  filterByWomen()
+
+  chrome.tabs.query({
+    active: true,
+    currentWindow: true
+  }, function (tabs) {
+    // ...and send a request for the DOM info...
+
+    // this function should be wrapped inside of an onClick !!!
+    chrome.tabs.sendMessage(
+        tabs[0].id,
+        {from: 'popup', subject: 'DOMInfo'},
+        // ...also specifying a callback to be called
+        //    from the receiving end (content script)
+        setDOMInfo);
+  });
+
+})
+
+

@@ -1,6 +1,11 @@
 'use strict';
-function runD3(){
-  filterByWomen();
+function runD3(data){
+
+  console.log("INSIDE D3: ", data)
+
+  if(document.getElementsByClassName('tooltip')){
+    d3.select('#chart').select('svg').remove()
+  }
 
   var tooltip = d3.select('#chart')
     .append('div')
@@ -48,7 +53,7 @@ function runD3(){
     .append('path')
     .attr('d', arc)
     .attr('fill', function(d, i) {
-      return color(d.data.sala);
+      return color(d.data.gender);
 
     });
 
@@ -58,7 +63,7 @@ function runD3(){
   }));
 
   var percent = Math.round(1000 * d.data.value / total) / 10;
-    tooltip.select('.label').html(d.data.sala);
+    tooltip.select('.label').html(d.data.gender);
     tooltip.select('.count').html(d.data.value);
     tooltip.select('.percent').html(percent + '%');
     tooltip.style('display', 'block');
@@ -92,16 +97,18 @@ function runD3(){
   .attr('y', legendRectSize - legendSpacing)
   .text(function(d) { return d; });
 
+  something()
+
 }
 
-(function(){
+function something(){
   var head = document.getElementsByTagName("head");
   var script = document.createElement("script");
 
-  script.onload = runD3();
+  // script.onload = runD3();
   script.onerror = function () { alert('Failed to load D3.') };
   script.src = "http://d3js.org/d3.v3.min.js";
   script.charset = "utf-8";
   // head.appendChild(script);
   console.log('script', script)
-})();
+}
